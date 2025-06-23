@@ -1,59 +1,64 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthLayout from "../../components/layouts/AuthLayout";
-import Input from "../../components/inputs/Input";
-import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Input from "../../components/Inputs/Input";
 import { validateEmail } from "../../utils/helper";
-//import { axiosInstance } from "../../utils/axiosInstance";
-//import { API_PATHS } from "../../utils/apiPaths";
-//import { UserContext } from "../../context/UserContext";
+import ProfilePhotoSelector from "../../components/Inputs/ProfilePhotoSelector";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import { UserContext } from "../../context/userContext";
+import uploadImage from "../../utils/uploadImage";
 
 const SignUp = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  //const [isLoading, setIsLoading] = useState(false);
 
-  // const { updateUser } = useContext(UserContext);
+  const { updateUser } = useContext(UserContext);
+
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const getInitials = (name) => {
-    const names = name.trim().split(" ");
-    if (names.length === 1) return names[0][0]?.toUpperCase() || "";
-    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-  };
+  //handle sign up form submit
 
-  const handleSignup = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
+    let profileImageUrl = "";
+
     if (!fullName) {
-      setError("Please Enter your name");
+      setError("Full Name is required");
       return;
     }
-
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
+      setError("Invalid Email Address");
       return;
     }
 
     if (!password) {
-      setError("Please Enter a valid password");
+      setError("Password is required");
       return;
     }
-
     setError("");
-    setIsLoading(true);
 
-    /*try {
+    //signup api call
+    try {
+      //image pfp if there
+      if (profilePicture) {
+        const imgUploadRes = await uploadImage(profilePicture);
+
+        profileImageUrl = imgUploadRes.imageUrl || "";
+      }
+
       const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
         fullName,
         email,
-        password
+        password,
+        profileImageUrl
       });
-      const { token, user } = response.data;
 
+      const { token, user } = response.data;
       if (token) {
         localStorage.setItem("token", token);
         updateUser(user);
@@ -63,22 +68,19 @@ const SignUp = () => {
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
       } else {
-        setError("Something went wrong. Please try again");
+        setError("Something went wrong in singup, please try again later");
       }
-    } finally {
-      setIsLoading(false);
-    }*/
+    }
   };
-
   return (
     <AuthLayout>
-      <div className="lg:w-[100%] h-auto md:h-full  flex flex-col justify-center">
+      <div className="lg:w-[100%] h-auto md:h-full md:mt-10 flex flex-col justify-center">
         <h3 className="text-xl font-semibold text-black">Create an Account</h3>
         <p className="text-xs text-slate-700 mt-[5px] mb-6">
           Please Join by entering the details!
         </p>
 
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleSignUp}>
           <ProfilePhotoSelector
             image={profilePicture}
             setImage={setProfilePicture}
