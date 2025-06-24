@@ -1,3 +1,5 @@
+import { GiReceiveMoney } from "react-icons/gi";
+
 const AuthLayout = ({ children }) => {
   return (
     <div className="flex">
@@ -5,7 +7,9 @@ const AuthLayout = ({ children }) => {
         <h2 className="text-lg font-medium text-black">Expense Tracker</h2>
         {children}
       </div>
-      <div className="hidden md:block w-[40vw] h-screen bg-violet-500 bg-auth-bg-img bg-cover bg-no-repeat bg-center overflow-hidden p-8 relative"></div>
+      <div className="hidden md:flex items-center justify-center w-[40vw] h-screen bg-violet-500 bg-auth-bg-img bg-cover bg-no-repeat bg-center overflow-hidden p-8 relative">
+        <GiReceiveMoney className="text-9xl text-white" />
+      </div>
     </div>
   );
 };
